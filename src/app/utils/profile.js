@@ -15,11 +15,3 @@ export default async function ProfilePage() {
     return <ProfileComponent user={user} />;
   }
 }
-
-// export function getInitials(name) {
-//   return name
-//     ?.split(' ')
-//     .map((n) => n[0])
-//     .join('')
-//     .toUpperCase();
-// }

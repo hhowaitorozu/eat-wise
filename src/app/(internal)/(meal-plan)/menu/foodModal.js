@@ -2,9 +2,24 @@
 
 import { useState } from 'react';
 
-import { Button } from '@/components/ui/button';
+import { mealTypeImageLinks } from '@/app/utils/prepareMealJson';
 // -> Impor komponen Dialog dari shadcn/ui
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+
+function getMealImage(type) {
+  const mealTypeImageLink = mealTypeImageLinks[type] || mealTypeImageLinks['default'];
+
+  return (
+    <div className="rounded-md w-full h-112 lg:h-112 md:h-64 mb-2 overflow-clip">
+      <img
+        src={mealTypeImageLink}
+        alt={`${type} meal`}
+        className="w-full h-full object-cover transition-all ease-in-out duration-300 hover:scale-110"
+      />
+    </div>
+  );
+}
+
 
 export default function FoodModal({ foods }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -23,11 +38,14 @@ export default function FoodModal({ foods }) {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <div className="grid grid-cols-5 gap-4">
+      <div className="self-center">
         {foods.map((food, i) => (
-          <Button key={i} onClick={() => openModal(i)} className="h-20 w-50 bg-amber-100 text-black">
-            {food.title}
-          </Button>
+          <div key={i} onClick={() => openModal(i)}>
+            <figure className="flex flex-col grow">
+              {getMealImage(food.type)}
+              <figcaption className="text-md text-gray-500 [font-variant:small-caps]">{food.title || 'No dish selected'}</figcaption>
+            </figure>
+          </div>
         ))}
       </div>
       <DialogContent className="sm:max-w-xl">
