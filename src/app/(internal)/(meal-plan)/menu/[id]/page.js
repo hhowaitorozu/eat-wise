@@ -1,5 +1,5 @@
 import ExportMealPlanPDFButton from '@/app/_components/pdf/ExportMealPlanPDFButton';
-import { prepareMealJson } from '@/app/utils/prepareMealJson';
+import { mealTypeLabels, prepareMealJson } from '@/app/utils/prepareMealJson';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import FoodModal from '../foodModal';
@@ -38,14 +38,22 @@ export default async function HistMenuDetail({ params }) {
   const defaultValue = dayData[0]?.value ?? 'day-1';
 
   return (
-    <div className="w-full p-6">
-      <Tabs defaultValue={defaultValue} className="w-full">
-        <TabsList className="w-full justify-start rounded-none border-b bg-[#dfd5c0] p-0">
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="page-title">Meal plan details</h1>
+        </div>
+
+        <ExportMealPlanPDFButton itemsMenu={itemsMenu} />
+      </div>
+
+      <Tabs defaultValue={defaultValue}>
+        <TabsList>
           {dayData.map((d) => (
             <TabsTrigger
               key={d.value}
               value={d.value}
-              className="bg-background data-[state=active]:border-primary h-full rounded-none border-b-2 border-transparent data-[state=active]:shadow-none"
+              className="px-5 cursor-pointer"
             >
               {d.label}
             </TabsTrigger>
@@ -55,17 +63,17 @@ export default async function HistMenuDetail({ params }) {
         {dayData.map((d) => (
           <TabsContent key={d.value} value={d.value} className="grid grid-cols-3 gap-4">
             {d.cards.map((c) => (
-              <div key={c.label} className="flex flex-col">
-                <p className="mt-4 mb-4 font-semibold text-gray-500 text-center">{c.label}</p>
+              <section
+                key={c.label}
+                className="bg-white rounded-xl shadow p-4 cursor-pointer"
+              >
+                <h2 className="text-lg font-semibold mb-2 text-gray-700">{mealTypeLabels[c.label.toLowerCase()]}</h2>
                 <FoodModal foods={[c.food]} />
-              </div>
+              </section>
             ))}
           </TabsContent>
         ))}
       </Tabs>
-      <div className="mt-10 flex w-full justify-end">
-        <ExportMealPlanPDFButton itemsMenu={itemsMenu} />
-      </div>
     </div>
   );
 }

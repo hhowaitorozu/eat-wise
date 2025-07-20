@@ -5,7 +5,7 @@ import prisma from '@/utils/prisma';
 
 export async function getMealPlanHistory({ page = 1, pageSize = 12 } = {}) {
   const userSession = await getCurrentSession();
-  
+
   const skip = (page - 1) * pageSize;
 
   const where = { userId : userSession.userId};

@@ -2,42 +2,66 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
 
-import FoodModal from '@/app/(app)/_components/foodModal';
 import { RegenerateButton } from '@/app/(app)/_components/RegenerateButton';
-import { getMealPlanById } from '@/app/(meal-plan)/create/action';
-import { getMealImage } from '@/app/utils/prepareMealJson';
+import { getMealPlanById } from '@/app/(internal)/(meal-plan)/create/action';
+import { mealTypeImageLinks, mealTypeLabels } from '@/app/utils/prepareMealJson';
 
 import { getMealPlanDetail } from './action';
 
-function renderMealSection(mealType, mealData, setOpenModal) {
+function getMealImage(type) {
+  const mealTypeImageLink = mealTypeImageLinks[type] || mealImageLinks['default'];
+
+  return (
+    <div className="rounded-md w-full h-112 lg:h-112 md:h-64 mb-2 overflow-clip">
+      <img
+        src={mealTypeImageLink}
+        alt={`${type} meal`}
+        className="w-full h-full object-cover transition-all ease-in-out duration-300 hover:scale-110"
+      />
+    </div>
+  );
+}
+
+function renderMealSection(mealType, mealData) {
   if (!mealData?.[mealType]?.dishName) {
-    return null; // Skip rendering if no dish is selected
+    return null;
   }
 
   return (
     <section
       key={mealType}
-      onClick={() => setOpenModal((prev) => ({ ...prev, [mealType]: true }))}
-      className="cursor-pointer items-stretch transition-opacity hover:opacity-80"
+      className="bg-white rounded-xl shadow p-4"
     >
-      <h1 className="text-lg font-semibold capitalize">{mealType}</h1>
-      <figure>
+      <h2 className="text-lg font-semibold mb-2 text-gray-700">{mealTypeLabels[mealType]}</h2>
+      <figure className="flex flex-col grow">
         {getMealImage(mealType)}
-        <figcaption className="mt-2 font-medium">{mealData?.[mealType]?.dishName || 'No dish selected'}</figcaption>
+        <figcaption className="text-md text-gray-500 [font-variant:small-caps]">{mealData?.[mealType]?.dishName || 'No dish selected'}</figcaption>
       </figure>
+
+      <hr className="my-2" />
+
+      <div className="text-sm text-gray-500 mt-2">
+        <h4 className="font-semibold">Ingredients</h4>
+        <p className="list-disc list-inside">
+          {mealData?.[mealType]?.ingredients}
+        </p>
+      </div>
+
+      <hr className="my-2" />
+
+      <div className="text-sm text-gray-500 mt-2">
+        <h4 className="font-semibold">Steps</h4>
+        <p className="list-disc list-inside">
+          {mealData?.[mealType]?.instructions}
+        </p>
+      </div>
     </section>
   );
 }
 
 export default function DashboardClient({ initialMealData, initialPlan }) {
-  const [openModal, setOpenModal] = useState({
-    breakfast: false,
-    lunch: false,
-    dinner: false,
-  });
   const mealTypes = ['breakfast', 'lunch', 'dinner'];
 
-  console.log('initialPlan', initialPlan);
   const [isLoading, setIsLoading] = useState(initialPlan.status === 'processing');
   const [mealData, setMealData] = useState(initialMealData);
   const [plan, setPlan] = useState(initialPlan);
@@ -88,12 +112,24 @@ export default function DashboardClient({ initialMealData, initialPlan }) {
   }, [plan.status]);
 
   return (
-    <div>
-      <h1 className="text-3xl">{plan.title}</h1>
+    <>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="page-title">Dashboard</h1>
+          <p className="text-gray-600">{plan.title}</p>
 
-      <h4 className="mb-3">
-        Day {plan.dayIndex} of {plan.days}
-      </h4>
+          <p className="text-sm text-gray-500 mt-1">
+            Day {plan.dayIndex} of {plan.days}
+          </p>
+        </div>
+
+        <RegenerateButton
+          mealPlanId={plan.id}
+          onDelete={handleRegenerate}
+          disabled={isLoading}
+          isLoading={isLoading}
+        />
+      </div>
 
       {isLoading ? (
         <div className="mt-8">
@@ -106,34 +142,11 @@ export default function DashboardClient({ initialMealData, initialPlan }) {
         </div>
       ) : (
         <div>
-          <div className="flex items-stretch justify-between gap-4">
-            {mealTypes.map((mealType) => renderMealSection(mealType, mealData, setOpenModal))}
-          </div>
-
-          {mealTypes.map(
-            (mealType) =>
-              mealData?.[mealType]?.dishName && (
-                <FoodModal
-                  key={mealType}
-                  mealType={mealType}
-                  mealData={mealData[mealType]}
-                  isOpen={openModal[mealType]}
-                  onClose={() => setOpenModal((prev) => ({ ...prev, [mealType]: false }))}
-                  getMealImage={getMealImage}
-                />
-              ),
-          )}
-
-          <div className="mt-6">
-            <RegenerateButton
-              mealPlanId={plan.id}
-              onDelete={handleRegenerate}
-              disabled={isLoading}
-              isLoading={isLoading}
-            />
+          <div className="grid grid-cols-3 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-6">
+            {mealTypes.map((mealType) => renderMealSection(mealType, mealData))}
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

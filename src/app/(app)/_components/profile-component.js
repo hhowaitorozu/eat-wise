@@ -10,7 +10,6 @@ export default function ProfileComponent({ user }) {
           {user.name}
         </Avatar.Fallback>
       </Avatar.Root>
-      <p className="mt-2 text-center text-sm text-black">Hi,{user.name}</p>
     </div>
   );
 }

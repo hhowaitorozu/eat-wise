@@ -14,7 +14,7 @@ export default function Sidebar(props = []) {
   const links = menuLinks.concat(additionalLinks.links || []);
 
   return (
-    <aside className="flex w-64 flex-col items-center gap-4 rounded-lg bg-gradient-to-b from-[#FAF8F4]/90 to-[#C7B590]/90 p-4 text-[#1C1C1C] shadow-xl backdrop-blur-sm">
+    <>
       <div>
         <ProfilePage></ProfilePage>
       </div>
@@ -37,6 +37,6 @@ export default function Sidebar(props = []) {
       <div className="mt-auto flex self-stretch">
         <LogoutButton></LogoutButton>
       </div>
-    </aside>
+    </>
   );
 }
